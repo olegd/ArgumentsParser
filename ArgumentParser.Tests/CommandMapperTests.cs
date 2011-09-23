@@ -20,7 +20,7 @@ namespace ArgumentParser.Tests
         [Test]
         public void MapCommand_CommandWithoutArguments_ReturnsMappedhandler()
         {
-            AddReturnedHandler(new HandlerDescriptor {Name = "merge"});
+            AddReturnedHandler("merge");
             
             var result = _commandMapper.MapCommand(new[] {"merge"});
 
@@ -31,9 +31,7 @@ namespace ArgumentParser.Tests
         [Test]
         public void MapCommand_CommandWitOneFlag_ReturnsCorrectHandler_MappsOneFlag()
         {
-            var handler = new HandlerDescriptor {Name = "merge"};
-            handler.Flags.Add("someFlag");
-            AddReturnedHandler(handler);
+            AddReturnedHandler("merge", flags: new[] { "someFlag" });
 
             var result = _commandMapper.MapCommand(new[] { "merge","someFlag" });
 
@@ -45,10 +43,7 @@ namespace ArgumentParser.Tests
         [Test]
         public void MapCommand_DefinedCommandHasTwoFlagsButArgumentContainsOnlyOneFlag_MappsOneFlagAndDoesNotMapTheOther()
         {
-            var handler = new HandlerDescriptor { Name = "merge" };
-            handler.Flags.Add("someFlag");
-            handler.Flags.Add("someOtherFlag");
-            AddReturnedHandler(handler);
+            AddReturnedHandler("merge", flags: new[] { "someFlag", "someOtherFlag" });
 
             var result = _commandMapper.MapCommand(new[] { "merge", "someFlag" });
 
@@ -61,11 +56,8 @@ namespace ArgumentParser.Tests
         [Test]
         public void MapCommand_DefinedCommandHasTwoFlagsButArgumentContainsOnlyOneFlag_MappsBothFlags()
         {
-            var handler = new HandlerDescriptor { Name = "merge" };
-            handler.Flags.Add("someFlag");
-            handler.Flags.Add("someOtherFlag");
-            AddReturnedHandler(handler);
-
+            AddReturnedHandler("merge", flags: new[] { "someFlag", "someOtherFlag" });
+            
             var result = _commandMapper.MapCommand(new[] { "merge", "someFlag", "someOtherFlag" });
 
             Assert.IsNotNull(result);
@@ -77,9 +69,7 @@ namespace ArgumentParser.Tests
         [Test]
         public void MapCommand_DefinedCommandHasAnArgument_MappsArguemtAndValue()
         {
-            var handler = new HandlerDescriptor { Name = "merge" };
-            handler.Arguments.Add("branchName");
-            AddReturnedHandler(handler);
+            AddReturnedHandler("merge", arguments: new[] {"branchName"});
 
             var result = _commandMapper.MapCommand(new[] { "merge", "superBranch" });
 
@@ -87,6 +77,31 @@ namespace ArgumentParser.Tests
             Assert.That(result.HandlerName, Is.EqualTo("merge"));
             CollectionAssert.Contains(result.ArgumentValues.Keys, "branchName");
             Assert.That(result.ArgumentValues["branchName"], Is.EqualTo("superBranch"));
+        }
+
+        [Test]
+        public void MapCommand_DefinedCommandHasAnArgument_MappsArguemtAndValueTYTY()
+        {
+            AddReturnedHandler("merge", arguments: new[] { "branchName" });
+
+            var result = _commandMapper.MapCommand(new[] { "merge", "superBranch" });
+
+            Assert.IsNotNull(result);
+            Assert.That(result.HandlerName, Is.EqualTo("merge"));
+            CollectionAssert.Contains(result.ArgumentValues.Keys, "branchName");
+            Assert.That(result.ArgumentValues["branchName"], Is.EqualTo("superBranch"));
+        }
+
+        private void AddReturnedHandler(string name, string[] arguments = null, string[] flags = null)
+        {
+            arguments = arguments ?? new string[0];
+            flags = flags ?? new string[0];
+
+            var handler = new HandlerDescriptor {Name = name};
+            handler.Arguments.AddRange(arguments);
+            handler.Flags.AddRange(flags);
+
+            AddReturnedHandler(handler);
         }
 
         private void AddReturnedHandler(IHandlerDescriptor handlerToAdd)
