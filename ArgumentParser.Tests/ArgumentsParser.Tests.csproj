@@ -56,15 +56,16 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandMapperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ArgumentParser\ArgumentParser.csproj">
+    <ProjectReference Include="..\ArgumentParser\ArgumentsParser.csproj">
       <Project>{A866DCE7-CCD4-48B9-A652-198877B56600}</Project>
-      <Name>ArgumentParser</Name>
+      <Name>ArgumentsParser</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

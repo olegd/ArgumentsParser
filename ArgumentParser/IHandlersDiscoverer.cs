@@ -5,6 +5,6 @@ namespace ArgumentParser
 {
     public interface IHandlersDiscoverer
     {
-        IEnumerable<IHandlerDescriptor> GetHandlers();
+        List<IHandlerDescriptor> GetHandlers();
     }
 }

@@ -7,7 +7,7 @@ namespace ArgumentParser
 {
     public class HandlersDiscoverer : IHandlersDiscoverer
     {
-        public IEnumerable<IHandlerDescriptor> GetHandlers()
+        public List<IHandlerDescriptor> GetHandlers()
         {
             Assembly assembly = Assembly.GetCallingAssembly();
 

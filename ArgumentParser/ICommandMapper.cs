@@ -2,6 +2,6 @@ namespace ArgumentParser
 {
     public interface ICommandMapper
     {
-        IHandlerDescriptor MapCommand(string[] args);
+        RoutingData MapCommand(string[] args);
     }
 }
