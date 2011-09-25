@@ -29,6 +29,15 @@ namespace ArgumentParser.Tests
         }
 
         [Test]
+        public void MapCommand_CommandCanNotBeFound_ThrowsException()
+        {
+            AddReturnedHandler("merge");
+
+            Assert.Throws<CommandMappingException>(()=>
+                _commandMapper.MapCommand(new[] { "anotherCommand" }));
+        }
+
+        [Test]
         public void MapCommand_CommandWitOneFlag_ReturnsCorrectHandler_MappsOneFlag()
         {
             AddReturnedHandler("merge", flags: new[] { "someFlag" });
@@ -47,8 +56,6 @@ namespace ArgumentParser.Tests
 
             var result = _commandMapper.MapCommand(new[] { "merge", "someFlag" });
 
-            Assert.IsNotNull(result);
-            Assert.That(result.HandlerName, Is.EqualTo("merge"));
             Assert.IsTrue(result.ArgumentValues.ContainsKey("someFlag"));
             Assert.IsFalse(result.ArgumentValues.ContainsKey("someOtherFlag"));
         }
@@ -60,8 +67,6 @@ namespace ArgumentParser.Tests
             
             var result = _commandMapper.MapCommand(new[] { "merge", "someFlag", "someOtherFlag" });
 
-            Assert.IsNotNull(result);
-            Assert.That(result.HandlerName, Is.EqualTo("merge"));
             Assert.IsTrue(result.ArgumentValues.ContainsKey("someFlag"));
             Assert.IsTrue(result.ArgumentValues.ContainsKey("someOtherFlag"));
         }
@@ -73,23 +78,42 @@ namespace ArgumentParser.Tests
 
             var result = _commandMapper.MapCommand(new[] { "merge", "superBranch" });
 
-            Assert.IsNotNull(result);
-            Assert.That(result.HandlerName, Is.EqualTo("merge"));
             CollectionAssert.Contains(result.ArgumentValues.Keys, "branchName");
             Assert.That(result.ArgumentValues["branchName"], Is.EqualTo("superBranch"));
         }
 
         [Test]
-        public void MapCommand_DefinedCommandHasAnArgument_MappsArguemtAndValueTYTY()
+        public void MapCommand_DefinedCommandHasTwoArguments_MappsBothArgumentsAndValues()
+        {
+            AddReturnedHandler("merge", arguments: new[] { "branchName", "anotherBranchName" });
+
+            var result = _commandMapper.MapCommand(new[] { "merge", "superBranch", "testingBranch" });
+
+            CollectionAssert.Contains(result.ArgumentValues.Keys, "branchName");
+            Assert.That(result.ArgumentValues["branchName"], Is.EqualTo("superBranch"));
+
+            CollectionAssert.Contains(result.ArgumentValues.Keys, "anotherBranchName");
+            Assert.That(result.ArgumentValues["anotherBranchName"], Is.EqualTo("testingBranch"));
+        }
+
+        [Test]
+        public void MapCommand_DefinedCommandHasLessArgumentsThanPassed_ThrowsExceptions()
         {
             AddReturnedHandler("merge", arguments: new[] { "branchName" });
 
-            var result = _commandMapper.MapCommand(new[] { "merge", "superBranch" });
+            Assert.Throws<CommandMappingException>(()=>
+                _commandMapper.MapCommand(new[] { "merge", "superBranch", "testingBranch" })
+            );
+        }
 
-            Assert.IsNotNull(result);
-            Assert.That(result.HandlerName, Is.EqualTo("merge"));
-            CollectionAssert.Contains(result.ArgumentValues.Keys, "branchName");
-            Assert.That(result.ArgumentValues["branchName"], Is.EqualTo("superBranch"));
+        [Test]
+        public void MapCommand_DefinedCommandHasMoreArgumentsThanPassed_ThrowsExceptions()
+        {
+            AddReturnedHandler("merge", arguments: new[] { "branchName", "anotherBranchName" });
+
+            Assert.Throws<CommandMappingException>(() =>
+                _commandMapper.MapCommand(new[] { "merge", "superBranch" })
+            );
         }
 
         private void AddReturnedHandler(string name, string[] arguments = null, string[] flags = null)

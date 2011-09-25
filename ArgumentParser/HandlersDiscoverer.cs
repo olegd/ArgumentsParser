@@ -9,9 +9,10 @@ namespace ArgumentParser
     {
         public List<IHandlerDescriptor> GetHandlers()
         {
-            Assembly assembly = Assembly.GetCallingAssembly();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-            var methodsWithAttr = from type in assembly.GetTypes()
+            var methodsWithAttr = from a in assemblies
+                                  from type in a.GetTypes()
                                   from member in type.GetMethods()
                                   where Attribute.IsDefined(member, typeof (CommandAttribute))
                                   select member;
@@ -35,6 +36,8 @@ namespace ArgumentParser
                         commandDescriptor.Flags.Add(parameter.Name);
                     }
                 }
+
+                result.Add(commandDescriptor);
             }
 
             return result;

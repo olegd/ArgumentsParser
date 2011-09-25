@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ArgumentParser
@@ -18,14 +19,14 @@ namespace ArgumentParser
 
             if (handler == null)
             {
-                return null;
+                throw new CommandMappingException("Handler for command: {0} does not exist".With(args[0]));
             }
 
             var result = new RoutingData();
             result.Handler = handler.HandlerMethodInfo;
             result.HandlerName = handler.Name;
 
-            int mappedArgumentCount = 0;
+            var unmappedArguemtns = new Queue<string>(handler.Arguments);
             int i = 1;
             while (i < args.Length)
             {
@@ -34,22 +35,26 @@ namespace ArgumentParser
                 {
                     result.ArgumentValues[nextArg] = true.ToString();
                 }
-                else // must be an argument
+                else //must be an argument then
                 {
-                    result.ArgumentValues[handler.Arguments[0]] = nextArg; 
+                    if (unmappedArguemtns.Any() == false)//don't have anything else to map
+                    {
+                        throw new CommandMappingException(
+                            "Number of arguments exceeded the number of argument type parameters on handler method");
+                    }
+                    var argumentCandidate = unmappedArguemtns.Dequeue();
+                    result.ArgumentValues[argumentCandidate] = nextArg;
                 }
-
-                
                 i++;
             }
 
+            //have something that wasn't mapped
+            if (unmappedArguemtns.Any())
+            {
+                throw new CommandMappingException(
+                    "Some of the arguments could not be bound to any paramenter on handler method");
+            }
 
-            //if next arg matches a flag, it's a flag
-            //if it matches complex argument name, read next arg to get the value
-            //
-
-            //try mapping arguments to known commands.
-            //if can't map - fail
             return result;
         }
 

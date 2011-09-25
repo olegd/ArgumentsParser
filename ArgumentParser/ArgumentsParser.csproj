@@ -43,6 +43,8 @@
     <Compile Include="ArgumentsRouter.cs" />
     <Compile Include="CommandAttribute.cs" />
     <Compile Include="CommandMapper.cs" />
+    <Compile Include="CommandMappingException.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="HandlerDescriptor.cs" />
     <Compile Include="HandlersDiscoverer.cs" />
     <Compile Include="ICommandMapper.cs" />
