@@ -1,0 +1,4 @@
+﻿* Add support for named commands, so that command name is not defined by handler name
+* Add support for non-static handlers
+* Add dependency resolver
+* Add support for configuration validation

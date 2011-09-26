@@ -121,7 +121,7 @@ namespace ArgumentParser.Tests
             arguments = arguments ?? new string[0];
             flags = flags ?? new string[0];
 
-            var handler = new HandlerDescriptor {Name = name};
+            var handler = new HandlerDescriptor {CommandName = name};
             handler.Arguments.AddRange(arguments);
             handler.Flags.AddRange(flags);
 

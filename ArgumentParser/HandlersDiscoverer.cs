@@ -9,22 +9,16 @@ namespace ArgumentParser
     {
         public List<IHandlerDescriptor> GetHandlers()
         {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            IEnumerable<MethodInfo> methodsWithAttr = FindAllMethodsWithCommandAttribute();
 
-            var methodsWithAttr = from a in assemblies
-                                  from type in a.GetTypes()
-                                  from member in type.GetMethods()
-                                  where Attribute.IsDefined(member, typeof (CommandAttribute))
-                                  select member;
-            
             var result = new List<IHandlerDescriptor>();
 
             foreach (var method in methodsWithAttr)
             {
                 var commandDescriptor = new HandlerDescriptor
                                             {
-                                                Name = method.Name,
-                                                HandlerMethodInfo = method
+                                                HandlerMethodInfo = method,
+                                                CommandName = GetCommandName(method)
                                             };
 
                 var parameters = method.GetParameters();
@@ -45,6 +39,26 @@ namespace ArgumentParser
             }
 
             return result;
+        }
+
+        private static IEnumerable<MethodInfo> FindAllMethodsWithCommandAttribute()
+        {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+            var methodsWithAttr = from a in assemblies
+                                  from type in a.GetTypes()
+                                  from member in type.GetMethods()
+                                  where Attribute.IsDefined(member, typeof (CommandAttribute))
+                                  select member;
+            return methodsWithAttr;
+        }
+
+        private string GetCommandName(MethodInfo handlerInfo)
+        {
+            var customAttribute = (CommandAttribute)Attribute.GetCustomAttribute(handlerInfo, typeof(CommandAttribute));
+            return string.IsNullOrWhiteSpace(customAttribute.CommandName)
+                                                ? handlerInfo.Name
+                                                : customAttribute.CommandName;
         }
     }
 }

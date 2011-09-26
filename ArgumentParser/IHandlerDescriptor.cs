@@ -5,7 +5,7 @@ namespace ArgumentParser
 {
     public interface IHandlerDescriptor
     {
-        string Name { get; set; }
+        string CommandName { get; set; }
         List<string> Flags { get; set; }
         List<string> Arguments { get; set; }
         Dictionary<string, string> ComplexArguments { get; set; }//keyword value OR keyword:value OR keyword=value

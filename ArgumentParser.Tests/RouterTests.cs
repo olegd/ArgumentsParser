@@ -86,6 +86,18 @@ namespace ArgumentParser.Tests
             Assert.That(passedBranchNameValue, Is.EqualTo("SuperBranch"));
             Assert.IsFalse(passedForceMergeFlagValue);
         }
+
+        [Test]
+        public void RouteCommand_HandlerHasCommandNameDefined_CommandIsRoutedBasedOnCommandNameNotMethodName()
+        {
+            bool commandInvoked = false;
+            CommandContainerForTests.MergeCommand4Callback = () => commandInvoked = true;
+
+            var router = new Router();
+            router.Route(new[] { "mergeall" });
+
+            Assert.IsTrue(commandInvoked);
+        }
     }
 
     public class CommandContainerForTests
@@ -93,6 +105,7 @@ namespace ArgumentParser.Tests
         public static Action MergeCommandCallback { get; set; }
         public static Action<bool> MergeCommand2Callback { get; set; }
         public static Action<string, bool> MergeCommand3Callback { get; set; }
+        public static Action MergeCommand4Callback { get; set; }
 
         [Command]
         public static void MergeCommand()
@@ -110,6 +123,12 @@ namespace ArgumentParser.Tests
         public static void MergeCommand3(string branchToMerge, bool forceMerge)
         {
             MergeCommand3Callback.Invoke(branchToMerge, forceMerge);
+        }
+
+        [Command(CommandName = "mergeall")]
+        public static void MergeCommand4()
+        {
+            MergeCommand4Callback.Invoke();   
         }
     }
 }

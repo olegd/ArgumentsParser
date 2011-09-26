@@ -5,7 +5,7 @@ namespace ArgumentParser
 {
     public class HandlerDescriptor : IHandlerDescriptor
     {
-        public string Name { get; set; }
+        public string CommandName { get; set; }
         public List<string> Flags { get; set; }
         public List<string> Arguments { get; set; }
         public Dictionary<string, string> ComplexArguments { get; set; }
