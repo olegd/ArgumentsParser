@@ -7,11 +7,11 @@ namespace ArgumentParser
     {
         public MethodInfo Handler { get; set; }
         public string HandlerName { get; set; }
-        public Dictionary<string, string> ArgumentValues { get; set; }
+        public Dictionary<string, object> ArgumentValues { get; set; }
 
         public RoutingData()
         {
-            ArgumentValues = new Dictionary<string, string>();
+            ArgumentValues = new Dictionary<string, object>();
         }
     }
 }

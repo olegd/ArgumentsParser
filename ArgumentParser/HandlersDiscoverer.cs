@@ -35,6 +35,10 @@ namespace ArgumentParser
                     {
                         commandDescriptor.Flags.Add(parameter.Name);
                     }
+                    else
+                    {
+                        commandDescriptor.Arguments.Add(parameter.Name);
+                    }
                 }
 
                 result.Add(commandDescriptor);

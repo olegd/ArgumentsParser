@@ -33,7 +33,7 @@ namespace ArgumentParser
                 string nextArg = args[i];
                 if (IsAFlag(nextArg, handler))
                 {
-                    result.ArgumentValues[nextArg] = true.ToString();
+                    result.ArgumentValues[nextArg] = true;
                 }
                 else //must be an argument then
                 {
