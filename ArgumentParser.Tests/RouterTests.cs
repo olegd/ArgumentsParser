@@ -1,4 +1,6 @@
 ﻿using System;
+using ArgumentParser.Core;
+using ArgumentParser.Handling;
 using NUnit.Framework;
 
 namespace ArgumentParser.Tests

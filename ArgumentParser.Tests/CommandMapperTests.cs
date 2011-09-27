@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using ArgumentParser.Configuration;
+using ArgumentParser.Core;
+using ArgumentParser.Routing;
 using Moq;
 using NUnit.Framework;
 
@@ -7,14 +10,14 @@ namespace ArgumentParser.Tests
     [TestFixture]
     public class CommandMapperTests
     {
-        private Mock<IHandlersDiscoverer> _handlerDiscovererMock;
-        private CommandMapper _commandMapper;
+        private Mock<IHandlerProvider> _handlerDiscovererMock;
+        private CommandToHandlerMapper _commandToHandlerMapper;
 
         [SetUp]
         public void BeforeEachTest()
         {
-            _handlerDiscovererMock = new Mock<IHandlersDiscoverer>();
-            _commandMapper = new CommandMapper(_handlerDiscovererMock.Object);
+            _handlerDiscovererMock = new Mock<IHandlerProvider>();
+            _commandToHandlerMapper = new CommandToHandlerMapper(_handlerDiscovererMock.Object);
         }
         
         [Test]
@@ -22,10 +25,10 @@ namespace ArgumentParser.Tests
         {
             AddReturnedHandler("merge");
             
-            var result = _commandMapper.MapCommand(new[] {"merge"});
+            var result = _commandToHandlerMapper.Map(new[] {"merge"});
 
             Assert.IsNotNull(result);
-            Assert.That(result.HandlerName, Is.EqualTo("merge"));
+            Assert.That(result.CommandName, Is.EqualTo("merge"));
         }
 
         [Test]
@@ -34,7 +37,7 @@ namespace ArgumentParser.Tests
             AddReturnedHandler("merge");
 
             Assert.Throws<CommandMappingException>(()=>
-                _commandMapper.MapCommand(new[] { "anotherCommand" }));
+                _commandToHandlerMapper.Map(new[] { "anotherCommand" }));
         }
 
         [Test]
@@ -42,10 +45,10 @@ namespace ArgumentParser.Tests
         {
             AddReturnedHandler("merge", flags: new[] { "someFlag" });
 
-            var result = _commandMapper.MapCommand(new[] { "merge","someFlag" });
+            var result = _commandToHandlerMapper.Map(new[] { "merge","someFlag" });
 
             Assert.IsNotNull(result);
-            Assert.That(result.HandlerName, Is.EqualTo("merge"));
+            Assert.That(result.CommandName, Is.EqualTo("merge"));
             Assert.That(result.ArgumentValues.ContainsKey("someFlag"));
         }
         
@@ -54,7 +57,7 @@ namespace ArgumentParser.Tests
         {
             AddReturnedHandler("merge", flags: new[] { "someFlag", "someOtherFlag" });
 
-            var result = _commandMapper.MapCommand(new[] { "merge", "someFlag" });
+            var result = _commandToHandlerMapper.Map(new[] { "merge", "someFlag" });
 
             Assert.IsTrue(result.ArgumentValues.ContainsKey("someFlag"));
             Assert.IsFalse(result.ArgumentValues.ContainsKey("someOtherFlag"));
@@ -65,7 +68,7 @@ namespace ArgumentParser.Tests
         {
             AddReturnedHandler("merge", flags: new[] { "someFlag", "someOtherFlag" });
             
-            var result = _commandMapper.MapCommand(new[] { "merge", "someFlag", "someOtherFlag" });
+            var result = _commandToHandlerMapper.Map(new[] { "merge", "someFlag", "someOtherFlag" });
 
             Assert.IsTrue(result.ArgumentValues.ContainsKey("someFlag"));
             Assert.IsTrue(result.ArgumentValues.ContainsKey("someOtherFlag"));
@@ -76,7 +79,7 @@ namespace ArgumentParser.Tests
         {
             AddReturnedHandler("merge", arguments: new[] {"branchName"});
 
-            var result = _commandMapper.MapCommand(new[] { "merge", "superBranch" });
+            var result = _commandToHandlerMapper.Map(new[] { "merge", "superBranch" });
 
             CollectionAssert.Contains(result.ArgumentValues.Keys, "branchName");
             Assert.That(result.ArgumentValues["branchName"], Is.EqualTo("superBranch"));
@@ -87,7 +90,7 @@ namespace ArgumentParser.Tests
         {
             AddReturnedHandler("merge", arguments: new[] { "branchName", "anotherBranchName" });
 
-            var result = _commandMapper.MapCommand(new[] { "merge", "superBranch", "testingBranch" });
+            var result = _commandToHandlerMapper.Map(new[] { "merge", "superBranch", "testingBranch" });
 
             CollectionAssert.Contains(result.ArgumentValues.Keys, "branchName");
             Assert.That(result.ArgumentValues["branchName"], Is.EqualTo("superBranch"));
@@ -102,7 +105,7 @@ namespace ArgumentParser.Tests
             AddReturnedHandler("merge", arguments: new[] { "branchName" });
 
             Assert.Throws<CommandMappingException>(()=>
-                _commandMapper.MapCommand(new[] { "merge", "superBranch", "testingBranch" })
+                _commandToHandlerMapper.Map(new[] { "merge", "superBranch", "testingBranch" })
             );
         }
 
@@ -112,7 +115,7 @@ namespace ArgumentParser.Tests
             AddReturnedHandler("merge", arguments: new[] { "branchName", "anotherBranchName" });
 
             Assert.Throws<CommandMappingException>(() =>
-                _commandMapper.MapCommand(new[] { "merge", "superBranch" })
+                _commandToHandlerMapper.Map(new[] { "merge", "superBranch" })
             );
         }
 
@@ -121,17 +124,17 @@ namespace ArgumentParser.Tests
             arguments = arguments ?? new string[0];
             flags = flags ?? new string[0];
 
-            var handler = new HandlerDescriptor {CommandName = name};
-            handler.Arguments.AddRange(arguments);
-            handler.Flags.AddRange(flags);
+            var handler = new Handler {CommandName = name};
+            handler.SupportedArguments.AddRange(arguments);
+            handler.SupportedFlags.AddRange(flags);
 
             AddReturnedHandler(handler);
         }
 
-        private void AddReturnedHandler(IHandlerDescriptor handlerToAdd)
+        private void AddReturnedHandler(IHandler handlerToAdd)
         {
-            List<IHandlerDescriptor> handlers = _handlerDiscovererMock.Object.GetHandlers() 
-                                    ?? new List<IHandlerDescriptor>();
+            List<IHandler> handlers = _handlerDiscovererMock.Object.GetHandlers() 
+                                    ?? new List<IHandler>();
             handlers.Add(handlerToAdd);
 
             _handlerDiscovererMock.Setup(x => x.GetHandlers())

@@ -1,5 +1,9 @@
-﻿* Add support for non-static handlers
+﻿Features:
+* Add support for non-static handlers
 * Add support for flag synonyms (-f or --f or f instead of "force")
 * Add support for argument synonyms
 * Add dependency resolver
 * Add support for configuration validation
+
+Presence:
+* Publish to nuGet

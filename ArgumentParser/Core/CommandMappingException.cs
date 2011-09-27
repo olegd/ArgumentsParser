@@ -1,6 +1,6 @@
 using System;
 
-namespace ArgumentParser
+namespace ArgumentParser.Core
 {
     public class CommandMappingException : Exception
     {

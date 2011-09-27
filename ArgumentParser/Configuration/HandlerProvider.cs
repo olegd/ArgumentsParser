@@ -2,20 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ArgumentParser.Core;
+using ArgumentParser.Routing;
 
-namespace ArgumentParser
+namespace ArgumentParser.Configuration
 {
-    public class HandlersDiscoverer : IHandlersDiscoverer
+    public class HandlerProvider : IHandlerProvider
     {
-        public List<IHandlerDescriptor> GetHandlers()
+        public List<IHandler> GetHandlers()
         {
             IEnumerable<MethodInfo> methodsWithAttr = FindAllMethodsWithCommandAttribute();
 
-            var result = new List<IHandlerDescriptor>();
+            var result = new List<IHandler>();
 
             foreach (var method in methodsWithAttr)
             {
-                var commandDescriptor = new HandlerDescriptor
+                var commandDescriptor = new Handler
                                             {
                                                 HandlerMethodInfo = method,
                                                 CommandName = GetCommandName(method)
@@ -27,11 +29,11 @@ namespace ArgumentParser
                 {
                     if (parameter.ParameterType == typeof(bool))
                     {
-                        commandDescriptor.Flags.Add(parameter.Name);
+                        commandDescriptor.SupportedFlags.Add(parameter.Name);
                     }
                     else
                     {
-                        commandDescriptor.Arguments.Add(parameter.Name);
+                        commandDescriptor.SupportedArguments.Add(parameter.Name);
                     }
                 }
 
@@ -41,7 +43,7 @@ namespace ArgumentParser
             return result;
         }
 
-        private static IEnumerable<MethodInfo> FindAllMethodsWithCommandAttribute()
+        private IEnumerable<MethodInfo> FindAllMethodsWithCommandAttribute()
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 

@@ -33,6 +33,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Routing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -40,23 +42,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArgumentsRouter.cs" />
-    <Compile Include="CommandAttribute.cs" />
-    <Compile Include="CommandMapper.cs" />
-    <Compile Include="CommandMappingException.cs" />
+    <Compile Include="Core\CommandAttribute.cs" />
+    <Compile Include="Routing\CommandToHandlerMapper.cs" />
+    <Compile Include="Core\CommandMappingException.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="HandlerDescriptor.cs" />
-    <Compile Include="HandlersDiscoverer.cs" />
-    <Compile Include="ICommandMapper.cs" />
-    <Compile Include="IHandlerDescriptor.cs" />
-    <Compile Include="IHandlersDiscoverer.cs" />
+    <Compile Include="Routing\Handler.cs" />
+    <Compile Include="Configuration\HandlerProvider.cs" />
+    <Compile Include="Routing\ICommandToHandlerMapper.cs" />
+    <Compile Include="Routing\IHandler.cs" />
+    <Compile Include="Configuration\IHandlerProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Router.cs" />
-    <Compile Include="RoutingData.cs" />
+    <Compile Include="Handling\Router.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Todo_features.txt" />
+    <Content Include="Todo_list.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

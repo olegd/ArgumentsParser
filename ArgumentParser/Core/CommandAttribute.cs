@@ -1,6 +1,6 @@
 using System;
 
-namespace ArgumentParser
+namespace ArgumentParser.Core
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class CommandAttribute : Attribute
