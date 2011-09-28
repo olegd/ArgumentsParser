@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\CommandAttribute.cs" />
+    <Compile Include="Handling\HandlerInvoker.cs" />
+    <Compile Include="Handling\IHandlerInvoker.cs" />
     <Compile Include="Routing\CommandToHandlerMapper.cs" />
     <Compile Include="Core\CommandMappingException.cs" />
     <Compile Include="ExtensionMethods.cs" />

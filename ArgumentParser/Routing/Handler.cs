@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using ArgumentParser.Core;
+using ArgumentParser.Handling;
 
 namespace ArgumentParser.Routing
 {
@@ -13,14 +13,15 @@ namespace ArgumentParser.Routing
         public List<string> SupportedArguments { get; set; }
         public Dictionary<string, string> SupportedComplexArguments { get; set; }
         public MethodInfo HandlerMethodInfo { get; set; }
-        public Dictionary<string, object> ArgumentValues { get; set; }
+
+        public IHandlerInvoker HandlerInvoker { get; set; }
 
         public Handler()
         {
             SupportedFlags = new List<string>();
             SupportedArguments = new List<string>();
             SupportedComplexArguments = new Dictionary<string, string>();
-            ArgumentValues = new Dictionary<string, object>();
+            HandlerInvoker = new HandlerInvoker();
         }
 
         public bool CanHandleCommand(string[] args)
@@ -29,82 +30,22 @@ namespace ArgumentParser.Routing
             return String.Equals(commandString, CommandName);
         }
 
-
-        //@refactor: remove the side effect: argumentValues are populated as part of this method. 
         public bool CanMapArguments(string[] args)
         {
-            var unmappedArguemtns = new Queue<string>(SupportedArguments);
-            int i = 1;
-            while (i < args.Length)
+            try
             {
-                string nextArg = args[i];
-                if (IsAFlag(nextArg))
-                {
-                    ArgumentValues[nextArg] = true;
-                }
-                else //must be an argument then
-                {
-                    if (unmappedArguemtns.Any() == false) //don't have anything else to map
-                    {
-                        throw new CommandMappingException(
-                            "Number of arguments exceeded the number of argument type parameters on handler method");
-                    }
-                    var argumentCandidate = unmappedArguemtns.Dequeue();
-                    ArgumentValues[argumentCandidate] = nextArg;
-                }
-                i++;
+                HandlerInvoker.MapArguments(this, args);
             }
-
-            //have something that wasn't mapped
-            if (unmappedArguemtns.Any())
+            catch (CommandMappingException)//@refactor: is there a better way?
             {
-                throw new CommandMappingException(
-                    "Some of the arguments could not be bound to any paramenter on handler method");
+                return false;
             }
-            //return result;
             return true;
         }
-
-       
-        private bool IsAFlag(string nextArg)
-        {
-            return SupportedFlags.Contains(nextArg);
-        }
-
+        
         public void Invoke(string[] args)
         {
-            //only support static methods for now..
-            if (!HandlerMethodInfo.IsStatic)
-            {
-                throw new NotSupportedException("Only static methods can be used as handlers");
-            }
-
-            object[] parameters = GetParameterValues();
-            HandlerMethodInfo.Invoke(null, parameters);
-        }
-
-        private object[] GetParameterValues()
-        {
-            var handlerParametersInfo = HandlerMethodInfo.GetParameters();
-
-            var result = new List<object>();
-            foreach (var parameterInfo in handlerParametersInfo)
-            {
-                if (ArgumentValues.ContainsKey(parameterInfo.Name))
-                {
-                    result.Add(ArgumentValues[parameterInfo.Name]);
-                }
-                else
-                {
-                    //if parameter is a flag, and we don't have a value for it
-                    if (parameterInfo.ParameterType == typeof(bool))
-                    {
-                        result.Add(false);//default all flags to false
-                    }
-                }
-            }
-
-            return Enumerable.ToArray(result);
+            HandlerInvoker.Invoke(this, args);
         }
     }
 }

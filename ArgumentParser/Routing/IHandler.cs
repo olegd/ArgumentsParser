@@ -11,7 +11,7 @@ namespace ArgumentParser.Routing
         //keyword value OR keyword:value OR keyword=value
         Dictionary<string, string> SupportedComplexArguments { get; set; }
         MethodInfo HandlerMethodInfo { get; set; }
-        Dictionary<string, object> ArgumentValues { get; set; }
+        
 
         bool CanHandleCommand(string[] args);
         bool CanMapArguments(string[] args);
