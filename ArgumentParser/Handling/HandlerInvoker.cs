@@ -23,13 +23,15 @@ namespace ArgumentParser.Handling
 
         public Dictionary<string, object> MapArguments(IHandler handler, string[] args)
         {
+            var trimmedArgs = args.RemoveEmptyElements();
+
             var argumentValues = new Dictionary<string, object>();
 
             var unmappedArguemtns = new Queue<string>(handler.SupportedArguments);
             int i = 1;
-            while (i < args.Length)
+            while (i < trimmedArgs.Length)
             {
-                string nextArg = args[i];
+                string nextArg = trimmedArgs[i];
                 if (IsAFlag(handler, nextArg))
                 {
                     argumentValues[nextArg] = true;

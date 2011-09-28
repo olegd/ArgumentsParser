@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using ArgumentParser.Handling;
-using ArgumentParser.Routing;
 using NUnit.Framework;
 
 namespace ArgumentParser.Tests
@@ -16,6 +15,26 @@ namespace ArgumentParser.Tests
             _invoker = new HandlerInvoker();
         }
 
+        [Test]
+        public void MapArguments_HandlerHasNoFlagsOrArgumentsANDCommandHasNoFlagsOrArguments_NothingIsMapped()
+        {
+            var handler = HandlerObjectMother.CreateHandler("merge");
+
+            var actualMappedArguemtns = _invoker.MapArguments(handler, new[] {"merge"});
+
+            Assert.That(actualMappedArguemtns.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void MapArguments_HandlerHasNoFlagsOrArgumentsANDCommandEmptyArguments_NothingIsMapped()
+        {
+            var handler = HandlerObjectMother.CreateHandler("merge");
+
+            var actualMappedArguemtns = _invoker.MapArguments(handler, new[] {"merge", "", " "});
+
+            Assert.That(actualMappedArguemtns.Count, Is.EqualTo(0));
+        }
+        
         [Test]
         public void MapArguments_HandlerHasOneFlagANDCommandHasOneFlag_FlagIsMappedToTrue()
         {

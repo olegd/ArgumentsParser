@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandToHandlerMapperTests.cs" />
+    <Compile Include="ExtensionMethodsTests.cs" />
     <Compile Include="HandlerInvokerTests.cs" />
     <Compile Include="HandlersDiscovererTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

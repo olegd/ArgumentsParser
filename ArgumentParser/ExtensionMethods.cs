@@ -1,4 +1,7 @@
-﻿namespace ArgumentParser
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace ArgumentParser
 {
     public static class ExtensionMethods
     {
@@ -14,6 +17,11 @@
                 return "Null";
             }
             return instance.ToString();
+        }
+
+        public static string[] RemoveEmptyElements(this string[] instance)
+        {
+            return instance.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
         }
     }
 }
