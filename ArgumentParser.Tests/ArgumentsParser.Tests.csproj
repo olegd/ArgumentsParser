@@ -56,10 +56,12 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandMapperTests.cs" />
+    <Compile Include="CommandToHandlerMapperTests.cs" />
+    <Compile Include="HandlerInvokerTests.cs" />
     <Compile Include="HandlersDiscovererTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RouterTests.cs" />
+    <Compile Include="HandlerObjectMother.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
