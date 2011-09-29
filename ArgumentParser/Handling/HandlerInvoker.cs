@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using ArgumentParser.Core;
 using ArgumentParser.Routing;
@@ -16,19 +15,10 @@ namespace ArgumentParser.Handling
             InvokeHandler(handler, parameters);
         }
 
-        private static void InvokeHandler(IHandler handler, object[] parameters)
+        private void InvokeHandler(IHandler handler, object[] parameters)
         {
-            if (handler.HandlerMethodInfo.IsStatic)
-            {
-                handler.HandlerMethodInfo.Invoke(null, parameters);
-            }
-            else
-            {
-                //need to ctor object here
-                Type declaringType = handler.HandlerMethodInfo.DeclaringType;
-                var instance = Activator.CreateInstance(declaringType);
-                handler.HandlerMethodInfo.Invoke(instance, parameters);
-            }
+            var handlerObject = HandlerObjectFactory.Create(handler.HandlerMethodInfo);
+            handler.HandlerMethodInfo.Invoke(handlerObject, parameters);
         }
 
         public Dictionary<string, object> MapArguments(IHandler handler, string[] args)
@@ -69,12 +59,12 @@ namespace ArgumentParser.Handling
             return argumentValues;
         }
         
-        private bool IsAFlag(IHandler handler, string nextArg)
+        private static bool IsAFlag(IHandler handler, string nextArg)
         {
             return handler.SupportedFlags.Contains(nextArg);
         }
 
-        private object[] GetParameterValues(IHandler handler, Dictionary<string, object> argumentValues)
+        private static object[] GetParameterValues(IHandler handler, Dictionary<string, object> argumentValues)
         {
             var handlerParametersInfo = handler.HandlerMethodInfo.GetParameters();
 
