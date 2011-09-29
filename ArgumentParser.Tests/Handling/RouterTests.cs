@@ -3,7 +3,7 @@ using ArgumentParser.Core;
 using ArgumentParser.Handling;
 using NUnit.Framework;
 
-namespace ArgumentParser.Tests
+namespace ArgumentParser.Tests.Handling
 {
     [TestFixture]
     public class RouterTests

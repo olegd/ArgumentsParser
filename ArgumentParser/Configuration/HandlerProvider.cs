@@ -43,7 +43,7 @@ namespace ArgumentParser.Configuration
             return result;
         }
 
-        private IEnumerable<MethodInfo> FindAllMethodsWithCommandAttribute()
+        protected virtual IEnumerable<MethodInfo> FindAllMethodsWithCommandAttribute()
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 

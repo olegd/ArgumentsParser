@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using ArgumentParser.Core;
 using ArgumentParser.Handling;
 using NUnit.Framework;
 
-namespace ArgumentParser.Tests
+namespace ArgumentParser.Tests.Handling
 {
     [TestFixture]
     public class HandlerInvokerTests
@@ -87,6 +89,32 @@ namespace ArgumentParser.Tests
             AssertIsMapped(actualMappedArguemtns, "branchName", "branchA");
             AssertIsMapped(actualMappedArguemtns, "anotherBranchName", "branchB");
         }
+
+        [Test]
+        public void Invoke_HandlerIsStaticMember_HandlerIsInvoked()
+        {
+            var handler = HandlerObjectMother.CreateHandler("merge");
+            handler.HandlerMethodInfo = typeof (StaticHandlers).GetMethod("Merge");
+            bool mergeInvoked = false;
+            StaticHandlers.MergeCallback = () => mergeInvoked = true;
+
+            _invoker.Invoke(handler, new[] { "merge" });
+
+            Assert.That(mergeInvoked, Is.EqualTo(true));
+        }
+
+        [Test]
+        public void Invoke_HandlerIsInstanceMemberOnObjectWithDefaultConstructor_HandlerIsInvoked()
+        {
+            var handler = HandlerObjectMother.CreateHandler("merge");
+            handler.HandlerMethodInfo = typeof(HandlerHostWithDefaultCtor).GetMethod("Merge");
+            bool mergeInvoked = false;
+            HandlerHostWithDefaultCtor.MergeCallback = () => mergeInvoked = true;
+
+            _invoker.Invoke(handler, new[] { "merge" });
+
+            Assert.That(mergeInvoked, Is.EqualTo(true));
+        }
         
         private void AssertIsMapped(Dictionary<string, object> mappedArgs, string parameterName,
                                         object expectedValue)
@@ -103,6 +131,26 @@ namespace ArgumentParser.Tests
         {
             Assert.IsFalse(mappedArgs.ContainsKey(flagName),
                            "Expected that flag {0} would NOT be mapped, but it was mapped".With(flagName));
+        }
+
+        private class StaticHandlers
+        {
+            public static Action MergeCallback { get; set; }
+            
+            public static void Merge()
+            {
+                MergeCallback.Invoke();
+            }
+        }
+
+        private class HandlerHostWithDefaultCtor
+        {
+            public static Action MergeCallback { get; set; }
+
+            public void Merge()
+            {
+                MergeCallback.Invoke();
+            }
         }
 
     }

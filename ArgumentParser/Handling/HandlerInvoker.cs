@@ -10,15 +10,25 @@ namespace ArgumentParser.Handling
     {
         public void Invoke(IHandler handler, string[] args)
         {
-            //only support for static methods for now..
-            if (!handler.HandlerMethodInfo.IsStatic)
-            {
-                throw new NotSupportedException("Only static methods can be used as handlers");
-            }
-
             var argumentValues = MapArguments(handler, args);
             object[] parameters = GetParameterValues(handler, argumentValues);
-            handler.HandlerMethodInfo.Invoke(null, parameters);
+
+            InvokeHandler(handler, parameters);
+        }
+
+        private static void InvokeHandler(IHandler handler, object[] parameters)
+        {
+            if (handler.HandlerMethodInfo.IsStatic)
+            {
+                handler.HandlerMethodInfo.Invoke(null, parameters);
+            }
+            else
+            {
+                //need to ctor object here
+                Type declaringType = handler.HandlerMethodInfo.DeclaringType;
+                var instance = Activator.CreateInstance(declaringType);
+                handler.HandlerMethodInfo.Invoke(instance, parameters);
+            }
         }
 
         public Dictionary<string, object> MapArguments(IHandler handler, string[] args)

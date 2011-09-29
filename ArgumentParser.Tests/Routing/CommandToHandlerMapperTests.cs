@@ -5,7 +5,7 @@ using ArgumentParser.Routing;
 using Moq;
 using NUnit.Framework;
 
-namespace ArgumentParser.Tests
+namespace ArgumentParser.Tests.Routing
 {
     [TestFixture]
     public class CommandToHandlerMapperTests
