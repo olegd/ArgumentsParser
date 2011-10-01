@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\CommandAttribute.cs" />
+    <Compile Include="DependencyResolver.cs" />
     <Compile Include="Handling\HandlerInvoker.cs" />
     <Compile Include="Handling\HandlerObjectFactory.cs" />
     <Compile Include="Handling\IHandlerInvoker.cs" />
@@ -65,6 +66,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DependencyResolution\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

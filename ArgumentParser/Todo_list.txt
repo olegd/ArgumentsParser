@@ -1,5 +1,4 @@
 ﻿Features:
-* Add support for constructor election, if more than one constructor and using DI
 * Add dependency resolver
 * Add support for flag synonyms (-f or --f or f instead of "force")
 * Add support for argument synonyms

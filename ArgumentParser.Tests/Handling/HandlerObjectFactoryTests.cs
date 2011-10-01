@@ -10,6 +10,8 @@ namespace ArgumentParser.Tests.Handling
     public class HandlerObjectFactoryTests
     {
         private TestDependencyServiceLocator _serviceLocator;
+        
+
         [SetUp]
         public void TestInitialize()
         {
