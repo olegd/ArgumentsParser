@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using ArgumentParser.Configuration;
+using ArgumentParser.Core;
 using NUnit.Framework;
 using System.Linq;
 
@@ -28,6 +29,17 @@ namespace ArgumentParser.Tests.Configuration
 //
 //            var result = handlerProvider.GetHandlers();
         }
+
+        public class CommandHandler
+        {
+            [Command]
+            public void Merge(string branchName, bool force)
+            {
+                
+            }
+        }
+
+        
 
         private HandlerProviderForTest CreateHandlerProvider(MethodInfoFake findAllMethodsWithCommandAttributeResult = null)
         {

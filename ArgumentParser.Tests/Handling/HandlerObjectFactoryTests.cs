@@ -9,6 +9,19 @@ namespace ArgumentParser.Tests.Handling
     [TestFixture]
     public class HandlerObjectFactoryTests
     {
+        private TestDependencyServiceLocator _serviceLocator;
+        [SetUp]
+        public void TestInitialize()
+        {
+            SetupNewServiceLocator();
+        }
+
+        private void SetupNewServiceLocator()
+        {
+            _serviceLocator = new TestDependencyServiceLocator();
+            ServiceLocator.SetLocatorProvider(() => _serviceLocator);
+        }
+
         [Test]
         public void CreateObject_MethodIsStatic_ReturnsNull()
         {
@@ -30,15 +43,12 @@ namespace ArgumentParser.Tests.Handling
         }
 
         [Test]
-        public void Invoke_HandlerIsInstanceMemberWithoutConstructorThatHasOneArgument_ArgumentTypeCanBeResolvedThroughServiceLocator_HandlerIsInvoked()
+        public void Invoke_HandlerIsInstanceMemberWithConstructorThatHasOneArgument_ArgumentTypeCanBeResolvedThroughServiceLocator_HandlerIsInvoked()
         {
             //Arrange
             var handlerMethod = typeof(HandlerHostWithoutDefaultCtor).GetMethod("Merge");
 
-            var dependencyResolver = new TestDependencyServiceLocator();
-            var dependencyObject = new Dependency();
-            dependencyResolver.Register(typeof(IDependency), dependencyObject);
-            ServiceLocator.SetLocatorProvider(() => dependencyResolver);
+            var dependencyObject = _serviceLocator.Register(typeof(IDependency), new Dependency());
 
             //Act
             var handlerObject = HandlerObjectFactory.Create(handlerMethod);
@@ -49,6 +59,28 @@ namespace ArgumentParser.Tests.Handling
             Assert.AreEqual(dependencyObject, ((HandlerHostWithoutDefaultCtor)handlerObject).Dependency);
         }
 
+        [Test]
+        public void Invoke_HandlerIsInstanceMemberWithTwoConstructorsThatHaveArgumentsThatCanBeResolvedThroughServiceLocator_HandlerIsInvoked()
+        {
+            //Arrange
+            var handlerMethod = typeof(HandlerHostWithTwoConstructors).GetMethod("Merge");
+
+            var dependency = _serviceLocator.Register(typeof(IDependency), new Dependency());
+            var dependency2 = _serviceLocator.Register(typeof(IDependency2), new Dependency2());
+            
+
+            //Act
+            var handlerObject = HandlerObjectFactory.Create(handlerMethod);
+
+            //Assert
+            Assert.IsNotNull(handlerObject);
+            Assert.IsInstanceOf<HandlerHostWithTwoConstructors>(handlerObject);
+            var castedHandlerObject = (HandlerHostWithTwoConstructors)handlerObject;
+            Assert.AreEqual(dependency, castedHandlerObject.Dependency);
+            Assert.AreEqual(dependency2, castedHandlerObject.Dependency2);
+        }
+
+       
         private class StaticHandlers
         {
             public static void Merge()
@@ -77,21 +109,62 @@ namespace ArgumentParser.Tests.Handling
             }
         }
 
+        private class HandlerHostWithTwoConstructors
+        {
+            public IDependency Dependency { get; set; }
+            public IDependency2 Dependency2 { get; set; }
+
+            public HandlerHostWithTwoConstructors(IDependency dependency)
+            {
+                Dependency = dependency;
+            }
+
+            public HandlerHostWithTwoConstructors(IDependency dependency, IDependency2 dependency2)
+            {
+                Dependency = dependency;
+                Dependency2 = dependency2;
+            }
+
+            public void Merge()
+            {
+            }
+        }
+
         private interface IDependency
         {
         }
-
+        
         private class Dependency : IDependency
         {
         }
 
+        private interface IDependency2
+        {
+        }
+
+        private class Dependency2 : IDependency2
+        {
+        }
+
+        private class Dependency3 : IDependency3
+        {
+        }
+
+        private interface IDependency3
+        {
+        }
+
+
+
+        #region simple DI
         public class TestDependencyServiceLocator : IServiceLocator
         {
             private Dictionary<Type, object> _instanceForType = new Dictionary<Type, object>();
 
-            public void Register(Type type, object instance)
+            public object Register(Type type, object instance)
             {
                 _instanceForType[type] = instance;
+                return instance;
             }
 
             public object GetService(Type serviceType)
@@ -129,5 +202,6 @@ namespace ArgumentParser.Tests.Handling
                 return new List<TService> { GetInstance<TService>() };
             }
         }
+        #endregion
     }
 }

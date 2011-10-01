@@ -29,6 +29,9 @@ namespace ArgumentParser.Handling
             Type declaringType = handlerMethod.DeclaringType;
             var constructors = declaringType.GetConstructors();
 
+            var resolvableConstructors = new Dictionary<ConstructorInfo, List<object>>();
+
+
             foreach (var constructorInfo in constructors)
             {
                 var ctorParams = constructorInfo.GetParameters();
@@ -53,10 +56,15 @@ namespace ArgumentParser.Handling
                     continue;
                 }
 
-                return constructorInfo.Invoke(ctorParamValues.ToArray());
+
+                resolvableConstructors.Add(constructorInfo, ctorParamValues);
             }
 
-            return null;
+            //find ctor with max arg
+            var ctorWithMaxArguments = resolvableConstructors.Aggregate((agg, next) => next.Value.Count > agg.Value.Count ? next : agg);
+            var handlerObject = ctorWithMaxArguments.Key.Invoke(ctorWithMaxArguments.Value.ToArray());
+
+            return handlerObject;
         }
 
         private static bool TryGetFromServiceLocator(Type type, out object value)
