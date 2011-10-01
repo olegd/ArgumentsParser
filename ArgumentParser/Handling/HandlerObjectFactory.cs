@@ -1,14 +1,8 @@
-﻿// *******************************************************************************
-// * Copyright (c) 1999 - 2011.
-// * Global Relay Communications Inc.
-// * All rights reserved.
-// *******************************************************************************
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Practices.ServiceLocation;
-using System.Linq;
 
 namespace ArgumentParser.Handling
 {
@@ -21,50 +15,36 @@ namespace ArgumentParser.Handling
                 return null;
             }
             
-            return ConstructAnObject(handlerMethod);
+            return ConstructAnObjectForMethod(handlerMethod);
         }
 
-        private static object ConstructAnObject(MethodInfo handlerMethod)
+        private static object ConstructAnObjectForMethod(MethodInfo handlerMethod)
         {
-            Type declaringType = handlerMethod.DeclaringType;
-            var constructors = declaringType.GetConstructors();
+            Type handlerDeclaringType = handlerMethod.DeclaringType;
+            var constructors = handlerDeclaringType.GetConstructors();
 
-            var resolvableConstructors = new Dictionary<ConstructorInfo, List<object>>();
-
-
-            foreach (var constructorInfo in constructors)
+            var resolvableConstructors = constructors.Select(TryResolveConstructorArguments);
+            var electedConstructor = ElectConstructor(resolvableConstructors);
+            return electedConstructor.Invoke();
+        }
+        
+        private static ResolvableConstructorInfo TryResolveConstructorArguments(ConstructorInfo constructorInfo)
+        {
+            var ctorParams = constructorInfo.GetParameters();
+            var ctorParamValues = new List<object>();
+            foreach (var ctorParam in ctorParams)
             {
-                var ctorParams = constructorInfo.GetParameters();
-                bool couldResolveAllParams = true;
-                var ctorParamValues = new List<object>();
-                foreach (var ctorParam in ctorParams)
+                object ctorParamValue;
+                if (TryGetFromServiceLocator(ctorParam.ParameterType, out ctorParamValue))
                 {
-                    object ctorParamValue;
-                    if (TryGetFromServiceLocator(ctorParam.ParameterType, out ctorParamValue))
-                    {
-                        ctorParamValues.Add(ctorParamValue);
-                    }
-                    else
-                    {
-                        couldResolveAllParams = false;
-                        break;
-                    }
+                    ctorParamValues.Add(ctorParamValue);
                 }
-
-                if (couldResolveAllParams == false)
+                else
                 {
-                    continue;
+                    return null;
                 }
-
-
-                resolvableConstructors.Add(constructorInfo, ctorParamValues);
             }
-
-            //find ctor with max arg
-            var ctorWithMaxArguments = resolvableConstructors.Aggregate((agg, next) => next.Value.Count > agg.Value.Count ? next : agg);
-            var handlerObject = ctorWithMaxArguments.Key.Invoke(ctorWithMaxArguments.Value.ToArray());
-
-            return handlerObject;
+            return new ResolvableConstructorInfo(constructorInfo, ctorParamValues);
         }
 
         private static bool TryGetFromServiceLocator(Type type, out object value)
@@ -79,6 +59,32 @@ namespace ArgumentParser.Handling
                 return false;
             }
             return true;
+        }
+
+        private static ResolvableConstructorInfo ElectConstructor(IEnumerable<ResolvableConstructorInfo> resolvableConstructors)
+        {
+            var ctorWithMaxNumberOfArguments =
+                resolvableConstructors.Aggregate(
+                    (agg, next) => next.ParameterValues.Count > agg.ParameterValues.Count ? next : agg);
+
+            return ctorWithMaxNumberOfArguments;
+        }
+
+        private class ResolvableConstructorInfo
+        {
+            public ConstructorInfo ConstructorInfo { get; private set; }
+            public List<object> ParameterValues { get; private set; }
+
+            public ResolvableConstructorInfo(ConstructorInfo constructorInfo, List<object> parameterValues)
+            {
+                ConstructorInfo = constructorInfo;
+                ParameterValues = parameterValues;
+            }
+
+            public object Invoke()
+            {
+                return ConstructorInfo.Invoke(ParameterValues.ToArray());
+            }
         }
     }
 }
