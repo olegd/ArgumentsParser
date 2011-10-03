@@ -39,9 +39,24 @@ Dependency Injection support
 --
 Arguments parser supports Common Service Locator:
 
->Just set ServiceProvider with your favourite dependency injection repository and ArgumentParser will inject the dependencies from the ServiceProvider, when constructing handler objects: 
+>Call DependencyResolver.SetRosolver with your favourite dependency injection repository and ArgumentParser will inject the dependencies from the ServiceLocator, when constructing handler objects: 
 
-    ServiceLocator.SetServiceProvider(()=>StructureMapDependencyResolver());
+    DependencyResolver.SetResolver(new StructureMapServiceLocator());
+
+
+>Alternativelly, you can implement IDependencyResolver interface to provide mapping for dependency resoltion to any dependency injection framework and register it with DependencyResolver:
+
+    
+    public class StructureMapDependencyResolver : IDependencyResolver
+    {
+        public object GetService(Type serviceType)
+        {
+            return ObjectFactory.GetInstance(serviceType);
+        }
+    }
+
+     DependencyResolver.SetResolver(new StructureMapDependencyResolver());
+
 
 
 =======
