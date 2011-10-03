@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ArgumentParser.DependencyResolution;
 
 namespace ArgumentParser.Handling
 {

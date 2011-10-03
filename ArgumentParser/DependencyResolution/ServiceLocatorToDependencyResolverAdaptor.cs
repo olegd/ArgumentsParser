@@ -1,7 +1,7 @@
 using System;
 using Microsoft.Practices.ServiceLocation;
 
-namespace ArgumentParser
+namespace ArgumentParser.DependencyResolution
 {
     public class ServiceLocatorToDependencyResolverAdaptor : IDependencyResolver
     {

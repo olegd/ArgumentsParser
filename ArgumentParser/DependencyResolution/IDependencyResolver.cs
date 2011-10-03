@@ -1,6 +1,6 @@
 using System;
 
-namespace ArgumentParser
+namespace ArgumentParser.DependencyResolution
 {
     public interface IDependencyResolver
     {

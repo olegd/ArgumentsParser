@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ArgumentParser.DependencyResolution;
 using ArgumentParser.Handling;
 using Microsoft.Practices.ServiceLocation;
 using NUnit.Framework;
@@ -36,7 +37,6 @@ namespace ArgumentParser.Tests.Handling
             var handlerMethod = typeof(HandlerHostWithoutDefaultCtor).GetMethod("Merge");
 
             var serviceLocator = new ServiceLocatorForTest();
-
             var dependencyObject = serviceLocator.Register(typeof(IDependency), new Dependency());
             DependencyResolver.SetResolver(serviceLocator);
 

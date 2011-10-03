@@ -1,6 +1,6 @@
 ﻿using Microsoft.Practices.ServiceLocation;
 
-namespace ArgumentParser
+namespace ArgumentParser.DependencyResolution
 {
     public class DependencyResolver
     {
@@ -17,3 +17,4 @@ namespace ArgumentParser
         }
     }
 }
+

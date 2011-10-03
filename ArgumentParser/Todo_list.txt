@@ -1,5 +1,4 @@
 ﻿Features:
-* Add dependency resolver
 * Add support for flag synonyms (-f or --f or f instead of "force")
 * Add support for argument synonyms
 
