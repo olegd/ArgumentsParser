@@ -9,21 +9,6 @@ namespace ArgumentParser.Tests.Handling
     [TestFixture]
     public class HandlerObjectFactoryTests
     {
-        private TestDependencyServiceLocator _serviceLocator;
-        
-
-        [SetUp]
-        public void TestInitialize()
-        {
-            SetupNewServiceLocator();
-        }
-
-        private void SetupNewServiceLocator()
-        {
-            _serviceLocator = new TestDependencyServiceLocator();
-            ServiceLocator.SetLocatorProvider(() => _serviceLocator);
-        }
-
         [Test]
         public void CreateObject_MethodIsStatic_ReturnsNull()
         {
@@ -50,7 +35,10 @@ namespace ArgumentParser.Tests.Handling
             //Arrange
             var handlerMethod = typeof(HandlerHostWithoutDefaultCtor).GetMethod("Merge");
 
-            var dependencyObject = _serviceLocator.Register(typeof(IDependency), new Dependency());
+            var serviceLocator = new ServiceLocatorForTest();
+
+            var dependencyObject = serviceLocator.Register(typeof(IDependency), new Dependency());
+            DependencyResolver.SetResolver(serviceLocator);
 
             //Act
             var handlerObject = HandlerObjectFactory.Create(handlerMethod);
@@ -60,15 +48,17 @@ namespace ArgumentParser.Tests.Handling
             Assert.IsInstanceOf<HandlerHostWithoutDefaultCtor>(handlerObject);
             Assert.AreEqual(dependencyObject, ((HandlerHostWithoutDefaultCtor)handlerObject).Dependency);
         }
-
+        
         [Test]
         public void Invoke_HandlerIsInstanceMemberWithTwoConstructorsThatHaveArgumentsThatCanBeResolvedThroughServiceLocator_HandlerIsInvoked()
         {
             //Arrange
             var handlerMethod = typeof(HandlerHostWithTwoConstructors).GetMethod("Merge");
 
-            var dependency = _serviceLocator.Register(typeof(IDependency), new Dependency());
-            var dependency2 = _serviceLocator.Register(typeof(IDependency2), new Dependency2());
+            var serviceLocator = new ServiceLocatorForTest();
+            var dependency = serviceLocator.Register(typeof(IDependency), new Dependency());
+            var dependency2 = serviceLocator.Register(typeof(IDependency2), new Dependency2());
+            DependencyResolver.SetResolver(serviceLocator);
             
 
             //Act
@@ -80,6 +70,25 @@ namespace ArgumentParser.Tests.Handling
             var castedHandlerObject = (HandlerHostWithTwoConstructors)handlerObject;
             Assert.AreEqual(dependency, castedHandlerObject.Dependency);
             Assert.AreEqual(dependency2, castedHandlerObject.Dependency2);
+        }
+
+        [Test]
+        public void Invoke_HandlerIsInstanceMemberWithConstructorThatHasOneArgument_ArgumentTypeCanBeResolvedThroughDependencyResolver_HandlerIsInvoked()
+        {
+            //Arrange
+            var handlerMethod = typeof(HandlerHostWithoutDefaultCtor).GetMethod("Merge");
+
+            var dependencyResolver = new DependencyResolverForTest();
+            var dependencyObject = dependencyResolver.Register(typeof(IDependency), new Dependency());
+            DependencyResolver.SetResolver(dependencyResolver);
+
+            //Act
+            var handlerObject = HandlerObjectFactory.Create(handlerMethod);
+
+            //Assert
+            Assert.IsNotNull(handlerObject);
+            Assert.IsInstanceOf<HandlerHostWithoutDefaultCtor>(handlerObject);
+            Assert.AreEqual(dependencyObject, ((HandlerHostWithoutDefaultCtor)handlerObject).Dependency);
         }
 
        
@@ -156,10 +165,25 @@ namespace ArgumentParser.Tests.Handling
         {
         }
 
+        public class DependencyResolverForTest : IDependencyResolver
+        {
+            private readonly Dictionary<Type, object> _instanceForType = new Dictionary<Type, object>();
+           
+            public object Register(Type serviceType, object instance)
+            {
+                _instanceForType[serviceType] = instance;
+                return instance;
+            }
+
+            public object GetService(Type serviceType)
+            {
+                return _instanceForType[serviceType];
+            }
+        }
 
 
-        #region simple DI
-        public class TestDependencyServiceLocator : IServiceLocator
+        #region simple Service Locator implementation
+        public class ServiceLocatorForTest : IServiceLocator
         {
             private Dictionary<Type, object> _instanceForType = new Dictionary<Type, object>();
 

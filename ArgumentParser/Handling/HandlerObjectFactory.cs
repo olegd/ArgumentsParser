@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Practices.ServiceLocation;
 
 namespace ArgumentParser.Handling
 {
@@ -52,7 +51,7 @@ namespace ArgumentParser.Handling
             value = null;
             try
             {
-                value = ServiceLocator.Current.GetInstance(type);
+                value = DependencyResolver.Current.GetService(type);
             }
             catch (Exception)
             {

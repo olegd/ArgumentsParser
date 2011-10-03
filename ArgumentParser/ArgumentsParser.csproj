@@ -46,10 +46,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\CommandAttribute.cs" />
-    <Compile Include="DependencyResolver.cs" />
+    <Compile Include="DependencyResolution\DependencyResolver.cs" />
     <Compile Include="Handling\HandlerInvoker.cs" />
     <Compile Include="Handling\HandlerObjectFactory.cs" />
     <Compile Include="Handling\IHandlerInvoker.cs" />
+    <Compile Include="DependencyResolution\IDependencyResolver.cs" />
     <Compile Include="Routing\CommandToHandlerMapper.cs" />
     <Compile Include="Core\CommandMappingException.cs" />
     <Compile Include="ExtensionMethods.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Configuration\IHandlerProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Handling\Router.cs" />
+    <Compile Include="DependencyResolution\ServiceLocatorToDependencyResolverAdaptor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Todo_list.txt" />
@@ -67,9 +69,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DependencyResolution\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
