@@ -1,16 +1,19 @@
 using System.Collections.Generic;
 using System.Reflection;
+using ArgumentParser.Configuration;
 
 namespace ArgumentParser.Routing
 {
     public interface IHandler
     {
         string CommandName { get; set; }
-        List<string> SupportedFlags { get; set; }
         List<string> SupportedArguments { get; set; }
         //keyword value OR keyword:value OR keyword=value
         Dictionary<string, string> SupportedComplexArguments { get; set; }
         MethodInfo HandlerMethodInfo { get; set; }
+
+        Flags Flags { get;  }
+        
         
 
         bool CanHandleCommand(string[] args);

@@ -1,4 +1,5 @@
 ﻿using System;
+using ArgumentParser.Configuration;
 using ArgumentParser.Core;
 using ArgumentParser.Handling;
 using NUnit.Framework;
@@ -100,6 +101,28 @@ namespace ArgumentParser.Tests.Handling
 
             Assert.IsTrue(commandInvoked);
         }
+
+        [Test]
+        public void RouteCommand_HandlerHasFlagsynonymDefined_FlagIsRoutedBasedOnThesynonym()
+        {
+            //Arrange
+            bool commandInvoked = false;
+            bool passedForceMergeFlagValue = false;
+            CommandContainerForTests.MergeCommand5Callback
+                = force =>
+                      {
+                          commandInvoked = true;
+                          passedForceMergeFlagValue = force;
+                      };
+
+            //Act
+            var router = new Router();
+            router.Route(new[] { "MergeCommand5", "-f" });
+
+            //Assert
+            Assert.IsTrue(commandInvoked);
+            Assert.IsTrue(passedForceMergeFlagValue);
+        }
     }
 
     public class CommandContainerForTests
@@ -108,6 +131,7 @@ namespace ArgumentParser.Tests.Handling
         public static Action<bool> MergeCommand2Callback { get; set; }
         public static Action<string, bool> MergeCommand3Callback { get; set; }
         public static Action MergeCommand4Callback { get; set; }
+        public static Action<bool> MergeCommand5Callback { get; set; }
 
         [Command]
         public static void MergeCommand()
@@ -120,7 +144,7 @@ namespace ArgumentParser.Tests.Handling
         {
             MergeCommand2Callback.Invoke(forceMerge);
         }
-
+        
         [Command]
         public static void MergeCommand3(string branchToMerge, bool forceMerge)
         {
@@ -131,6 +155,13 @@ namespace ArgumentParser.Tests.Handling
         public static void MergeCommand4()
         {
             MergeCommand4Callback.Invoke();   
+        }
+
+        [Command]
+        [DefineSynonym("force",  Synonyms = "-f")]
+        public static void MergeCommand5(bool force)
+        {
+            MergeCommand5Callback.Invoke(force);
         }
     }
 }

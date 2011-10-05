@@ -32,9 +32,10 @@ namespace ArgumentParser.Handling
             while (i < trimmedArgs.Length)
             {
                 string nextArg = trimmedArgs[i];
-                if (IsAFlag(handler, nextArg))
+                if (handler.Flags.Resolve(nextArg) != null)
                 {
-                    argumentValues[nextArg] = true;
+                    var resolvedFlag = handler.Flags.Resolve(nextArg);
+                    argumentValues[resolvedFlag] = true;
                 }
                 else //must be an argument then
                 {
@@ -57,11 +58,6 @@ namespace ArgumentParser.Handling
             }
 
             return argumentValues;
-        }
-        
-        private static bool IsAFlag(IHandler handler, string nextArg)
-        {
-            return handler.SupportedFlags.Contains(nextArg);
         }
 
         private static object[] GetParameterValues(IHandler handler, Dictionary<string, object> argumentValues)

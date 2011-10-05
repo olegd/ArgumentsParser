@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\DefineSynonymAttribute.cs" />
+    <Compile Include="Configuration\Flags.cs" />
     <Compile Include="Core\CommandAttribute.cs" />
     <Compile Include="DependencyResolution\DependencyResolver.cs" />
     <Compile Include="Handling\HandlerInvoker.cs" />

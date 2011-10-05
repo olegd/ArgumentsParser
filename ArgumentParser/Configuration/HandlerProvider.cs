@@ -24,12 +24,20 @@ namespace ArgumentParser.Configuration
                                             };
 
                 var parameters = method.GetParameters();
-                
+
+                var synonymsMap = GetsynonymsMap(commandDescriptor, method);
+
                 foreach (var parameter in parameters)
                 {
                     if (parameter.ParameterType == typeof(bool))
                     {
-                        commandDescriptor.SupportedFlags.Add(parameter.Name);
+//                        commandDescriptor.SupportedFlags.Add(parameter.Name);
+                        string synonyms = null; 
+                        if (synonymsMap.ContainsKey(parameter.Name))
+                        {
+                            synonyms = synonymsMap[parameter.Name];
+                        }
+                        commandDescriptor.Flags.Add(parameter.Name, synonyms);
                     }
                     else
                     {
@@ -40,6 +48,21 @@ namespace ArgumentParser.Configuration
                 result.Add(commandDescriptor);
             }
 
+            return result;
+        }
+
+        private static Dictionary<string, string> GetsynonymsMap(Handler commandDescriptor, MethodInfo method)
+        {
+            var result = new Dictionary<string, string>();
+            var synonymAttributes = Attribute.GetCustomAttributes(method, typeof (DefineSynonymAttribute));
+            if (synonymAttributes.Any())
+            {
+                foreach (var synonymAttribute in synonymAttributes)
+                {
+                    var attribute = ((DefineSynonymAttribute) synonymAttribute);
+                    result[attribute.ArgumentName] = attribute.Synonyms;
+                }
+            }
             return result;
         }
 

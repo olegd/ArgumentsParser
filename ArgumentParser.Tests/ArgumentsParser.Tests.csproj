@@ -59,6 +59,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\FlagsTests.cs" />
     <Compile Include="Handling\HandlerObjectFactoryTests.cs" />
     <Compile Include="Routing\CommandToHandlerMapperTests.cs" />
     <Compile Include="ExtensionMethodsTests.cs" />

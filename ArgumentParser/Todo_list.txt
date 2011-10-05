@@ -1,6 +1,5 @@
 ﻿Features:
 * Add support for flag synonyms (-f or --f or f instead of "force")
-* Add support for argument synonyms
 
 * Add support for configuration validation
 

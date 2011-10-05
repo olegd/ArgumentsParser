@@ -11,7 +11,11 @@ namespace ArgumentParser.Tests
 
             var handler = new Handler { CommandName = name };
             handler.SupportedArguments.AddRange(arguments);
-            handler.SupportedFlags.AddRange(flags);
+
+            foreach (var flag in flags)
+            {
+                handler.Flags.Add(flag);
+            }
 
             return handler;
         } 
