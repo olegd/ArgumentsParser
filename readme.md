@@ -21,6 +21,14 @@ You are designing a program that should support **merge** command, should take a
         {         
         }
     }
+   
+    static void Main(string[] args)
+    {
+        var router = new Router();
+        router.Route(args);
+    }
+
+
 
 ArgumentsParser assumes a convention that Handler Methods are names after commands: if console application takes merge as a first argument, by convention, argument parser will try to find handler method named Merge (case insensitive)
 
